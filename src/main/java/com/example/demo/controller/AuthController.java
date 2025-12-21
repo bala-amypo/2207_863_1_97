@@ -6,7 +6,9 @@ import com.example.demo.dto.RegisterRequest;
 import com.example.demo.entity.User;
 import com.example.demo.security.JwtUtil;
 import com.example.demo.service.UserService;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -16,57 +18,68 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
+@Tag(name = "Authentication", description = "APIs for user authentication and registration")
 public class AuthController {
-
+    
     private final UserService userService;
     private final JwtUtil jwtUtil;
     private final BCryptPasswordEncoder passwordEncoder;
-
-    public AuthController(UserService userService,
-                          JwtUtil jwtUtil,
-                          BCryptPasswordEncoder passwordEncoder) {
+    
+    public AuthController(UserService userService, JwtUtil jwtUtil, BCryptPasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.jwtUtil = jwtUtil;
         this.passwordEncoder = passwordEncoder;
     }
-
+    
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody RegisterRequest request) {
-
+    @Operation(summary = "Register a new user")
+    public ResponseEntity<User> register(@RequestBody RegisterRequest registerRequest) {
         User user = User.builder()
-                .name(request.getName())
-                .email(request.getEmail())
-                .password(request.getPassword())
-                .role(request.getRole())
-                .build();
-
-        User savedUser = userService.register(user);
-        return ResponseEntity.ok(savedUser);
+            .name(registerRequest.getName())
+            .email(registerRequest.getEmail())
+            .password(registerRequest.getPassword())
+            .role(registerRequest.getRole())
+            .build();
+        
+        User registeredUser = userService.register(user);
+        return ResponseEntity.ok(registeredUser);
     }
-
+    
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
-
-        User user = userService.findByEmail(request.getEmail());
-
-        if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            return ResponseEntity.status(401).build();
+    @Operation(summary = "Login and get JWT token")
+    public ResponseEntity<?> login(@RequestBody AuthRequest authRequest) {
+        User user = userService.findByEmail(authRequest.getEmail());
+        
+        if (user == null) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Invalid credentials");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }
-
+        
+        // Validate password
+        if (!passwordEncoder.matches(authRequest.getPassword(), user.getPassword())) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Invalid credentials");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        }
+        
+        // Build claims map
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", user.getId());
         claims.put("email", user.getEmail());
-        claims.put("role", user.getRole().toString());
-
+        claims.put("role", user.getRole());
+        
+        // Generate token
         String token = jwtUtil.generateToken(claims, user.getEmail());
-
-        AuthResponse response = new AuthResponse(
-                token,
-                user.getId(),
-                user.getEmail(),
-                user.getRole().toString()
-        );
-
-        return ResponseEntity.ok(response);
+        
+        // Build response
+        AuthResponse authResponse = AuthResponse.builder()
+            .token(token)
+            .userId(user.getId())
+            .email(user.getEmail())
+            .role(user.getRole())
+            .build();
+        
+        return ResponseEntity.ok(authResponse);
     }
 }

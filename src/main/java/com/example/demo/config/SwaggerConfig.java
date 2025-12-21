@@ -10,20 +10,21 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SwaggerConfig {
-
+    
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
-                .info(new Info()
-                        .title("Digital Certificate Generator API")
-                        .version("1.0")
-                        .description("API for managing digital certificates"))
-                .addSecurityItem(new SecurityRequirement().addList("bearer-jwt"))
-                .components(new Components()
-                        .addSecuritySchemes("bearer-jwt",
-                                new SecurityScheme()
-                                        .type(SecurityScheme.Type.HTTP)
-                                        .scheme("bearer")
-                                        .bearerFormat("JWT")));
+            .info(new Info()
+                .title("Digital Certificate Generator API")
+                .version("1.0")
+                .description("API documentation for Digital Certificate Generator"))
+            .addSecurityItem(new SecurityRequirement().addList("bearer-jwt"))
+            .components(new Components()
+                .addSecuritySchemes("bearer-jwt", new SecurityScheme()
+                    .type(SecurityScheme.Type.HTTP)
+                    .scheme("bearer")
+                    .bearerFormat("JWT")
+                    .in(SecurityScheme.In.HEADER)
+                    .name("Authorization")));
     }
 }
