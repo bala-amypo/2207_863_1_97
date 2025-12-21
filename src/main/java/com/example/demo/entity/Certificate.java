@@ -1,0 +1,42 @@
+package com.example.demo.entity;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
+import java.time.LocalDate;
+import java.util.List;
+
+@Entity
+@Table(name = "certificates")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Certificate {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @ManyToOne
+    @JoinColumn(name = "student_id")
+    private Student student;
+    
+    @ManyToOne
+    @JoinColumn(name = "template_id")
+    private CertificateTemplate template;
+    
+    private LocalDate issuedDate;
+    
+    @Column(columnDefinition = "TEXT")
+    private String qrCodeUrl;
+    
+    @Column(unique = true)
+    private String verificationCode;
+    
+    @OneToMany(mappedBy = "certificate", cascade = CascadeType.ALL)
+    private List<VerificationLog> verificationLogs;
+}
