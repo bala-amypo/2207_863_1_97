@@ -1,38 +1,38 @@
 package com.example.demo.service.impl;
 
+import org.springframework.stereotype.Service;
 import com.example.demo.entity.Student;
 import com.example.demo.repository.StudentRepository;
 import com.example.demo.service.StudentService;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class StudentServiceImpl implements StudentService {
-    
-    private final StudentRepository studentRepository;
-    
-    public StudentServiceImpl(StudentRepository studentRepository) {
-        this.studentRepository = studentRepository;
+
+    private final StudentRepository repository;
+
+    public StudentServiceImpl(StudentRepository repository) {
+        this.repository = repository;
     }
-    
+
     @Override
     public Student addStudent(Student student) {
-        if (studentRepository.findByEmail(student.getEmail()).isPresent() ||
-            studentRepository.findByRollNumber(student.getRollNumber()).isPresent()) {
+        if (repository.findByEmail(student.getEmail()).isPresent() ||
+            repository.findByRollNumber(student.getRollNumber()).isPresent()) {
             throw new RuntimeException("Student email exists");
         }
-        return studentRepository.save(student);
+        return repository.save(student);
     }
-    
+
     @Override
     public List<Student> getAllStudents() {
-        return studentRepository.findAll();
+        return repository.findAll();
     }
-    
+
     @Override
     public Student findById(Long id) {
-        return studentRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Student not found"));
+        return repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Student not found"));
     }
 }
