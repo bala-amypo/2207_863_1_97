@@ -10,19 +10,19 @@ import java.util.List;
 @RestController
 @RequestMapping("/students")
 public class StudentController {
-    
+
     private final StudentService studentService;
-    
+
     public StudentController(StudentService studentService) {
         this.studentService = studentService;
     }
-    
+
     @PostMapping
     public ResponseEntity<Student> addStudent(@RequestBody Student student) {
         Student savedStudent = studentService.addStudent(student);
         return ResponseEntity.ok(savedStudent);
     }
-    
+
     @GetMapping
     public ResponseEntity<List<Student>> getAllStudents() {
         List<Student> students = studentService.getAllStudents();
