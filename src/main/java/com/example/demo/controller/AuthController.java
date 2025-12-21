@@ -6,6 +6,7 @@ import com.example.demo.dto.RegisterRequest;
 import com.example.demo.entity.User;
 import com.example.demo.security.JwtUtil;
 import com.example.demo.service.UserService;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -55,7 +56,7 @@ public class AuthController {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", user.getId());
         claims.put("email", user.getEmail());
-        claims.put("role", user.getRole().toString()); // FIX
+        claims.put("role", user.getRole().toString());
 
         String token = jwtUtil.generateToken(claims, user.getEmail());
 
@@ -63,7 +64,7 @@ public class AuthController {
                 token,
                 user.getId(),
                 user.getEmail(),
-                user.getRole().toString() // FIX
+                user.getRole().toString()
         );
 
         return ResponseEntity.ok(response);
