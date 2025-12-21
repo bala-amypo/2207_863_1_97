@@ -17,6 +17,7 @@ public class SwaggerConfig {
             .info(new Info()
                 .title("Digital Certificate Generator API")
                 .version("1.0")
+               
                 .description("API documentation for Digital Certificate Generator"))
             .addSecurityItem(new SecurityRequirement().addList("bearer-jwt"))
             .components(new Components()
