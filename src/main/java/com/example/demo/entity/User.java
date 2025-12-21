@@ -1,10 +1,11 @@
 package com.example.demo.entity;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
 
 @Entity
 @Table(name = "users")
@@ -25,5 +26,10 @@ public class User {
     
     private String password;
     
-    private String role;
+    @Builder.Default
+    private String role = "STAFF";
+
+    public Object getRole() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

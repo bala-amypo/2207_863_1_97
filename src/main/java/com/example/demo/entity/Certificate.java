@@ -1,11 +1,13 @@
 package com.example.demo.entity;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "certificates")
@@ -29,9 +31,12 @@ public class Certificate {
     
     private LocalDate issuedDate;
     
-    @Column(length = 10000)
+    @Column(columnDefinition = "TEXT")
     private String qrCodeUrl;
     
     @Column(unique = true)
     private String verificationCode;
+    
+    @OneToMany(mappedBy = "certificate", cascade = CascadeType.ALL)
+    private List<VerificationLog> verificationLogs;
 }

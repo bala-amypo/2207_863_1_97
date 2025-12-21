@@ -1,10 +1,12 @@
 package com.example.demo.entity;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "certificate_templates")
@@ -26,4 +28,7 @@ public class CertificateTemplate {
     private String fontStyle;
     
     private String signatureName;
+    
+    @OneToMany(mappedBy = "template", cascade = CascadeType.ALL)
+    private List<Certificate> certificates;
 }
