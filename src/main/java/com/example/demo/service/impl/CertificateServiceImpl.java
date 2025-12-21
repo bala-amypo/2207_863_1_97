@@ -26,80 +26,73 @@ import java.util.UUID;
 
 @Service
 public class CertificateServiceImpl implements CertificateService {
-    
+
     private final CertificateRepository certificateRepository;
     private final StudentRepository studentRepository;
     private final CertificateTemplateRepository templateRepository;
-    
+
     public CertificateServiceImpl(CertificateRepository certificateRepository,
-                                   StudentRepository studentRepository,
-                                   CertificateTemplateRepository templateRepository) {
+                                  StudentRepository studentRepository,
+                                  CertificateTemplateRepository templateRepository) {
         this.certificateRepository = certificateRepository;
         this.studentRepository = studentRepository;
         this.templateRepository = templateRepository;
     }
-    
+
     @Override
     public Certificate generateCertificate(Long studentId, Long templateId) {
-        // Fetch student
         Student student = studentRepository.findById(studentId)
-            .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
         
-        // Fetch template
         CertificateTemplate template = templateRepository.findById(templateId)
-            .orElseThrow(() -> new ResourceNotFoundException("Template not found"));
-        
-        // Generate unique verification code
+                .orElseThrow(() -> new ResourceNotFoundException("Template not found"));
+
         String verificationCode = "VC-" + UUID.randomUUID().toString();
-        
-        // Generate QR code
         String qrCodeUrl = generateQRCode(verificationCode);
-        
-        // Create certificate
+
         Certificate certificate = Certificate.builder()
-            .student(student)
-            .template(template)
-            .issuedDate(LocalDate.now())
-            .verificationCode(verificationCode)
-            .qrCodeUrl(qrCodeUrl)
-            .build();
-        
+                .student(student)
+                .template(template)
+                .issuedDate(LocalDate.now())
+                .verificationCode(verificationCode)
+                .qrCodeUrl(qrCodeUrl)
+                .build();
+
         return certificateRepository.save(certificate);
     }
-    
+
     @Override
     public Certificate getCertificate(Long certificateId) {
         return certificateRepository.findById(certificateId)
-            .orElseThrow(() -> new ResourceNotFoundException("Certificate not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Certificate not found"));
     }
-    
+
     @Override
     public Certificate findByVerificationCode(String code) {
         return certificateRepository.findByVerificationCode(code)
-            .orElseThrow(() -> new ResourceNotFoundException("Certificate not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Certificate not found"));
     }
-    
+
     @Override
     public List<Certificate> findByStudentId(Long studentId) {
         Student student = studentRepository.findById(studentId)
-            .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
         return certificateRepository.findByStudent(student);
     }
-    
+
     private String generateQRCode(String text) {
         try {
             QRCodeWriter qrCodeWriter = new QRCodeWriter();
             BitMatrix bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, 200, 200);
-            BufferedImage bufferedImage = MatrixToImageWriter.toBufferedImage(bitMatrix);
+            BufferedImage qrImage = MatrixToImageWriter.toBufferedImage(bitMatrix);
             
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(bufferedImage, "png", baos);
+            ImageIO.write(qrImage, "PNG", baos);
             byte[] imageBytes = baos.toByteArray();
-            String base64Image = Base64.getEncoder().encodeToString(imageBytes);
             
-            return "data:image/png;base64," + base64Image;
+            return "data:image/png;base64," + Base64.getEncoder().encodeToString(imageBytes);
         } catch (WriterException | IOException e) {
-            throw new RuntimeException("Error generating QR code: " + e.getMessage());
+            throw new RuntimeException("Failed to generate QR code", e);
         }
     }
 }

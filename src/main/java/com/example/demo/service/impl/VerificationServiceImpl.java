@@ -10,53 +10,48 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class VerificationServiceImpl implements VerificationService {
-    
-    private final CertificateRepository certificateRepository;
+
     private final VerificationLogRepository logRepository;
-    
-    public VerificationServiceImpl(CertificateRepository certificateRepository,
-                                    VerificationLogRepository logRepository) {
-        this.certificateRepository = certificateRepository;
+    private final CertificateRepository certificateRepository;
+
+    public VerificationServiceImpl(VerificationLogRepository logRepository,
+                                   CertificateRepository certificateRepository) {
         this.logRepository = logRepository;
+        this.certificateRepository = certificateRepository;
     }
-    
+
     @Override
     public VerificationLog verifyCertificate(String verificationCode, String clientIp) {
-        Optional<Certificate> certificateOpt = certificateRepository.findByVerificationCode(verificationCode);
+        Certificate certificate = null;
+        String status = "FAILED";
         
-        VerificationLog log;
-        
-        if (certificateOpt.isPresent()) {
-            log = VerificationLog.builder()
-                .certificate(certificateOpt.get())
-                .verifiedAt(LocalDateTime.now())
-                .status("SUCCESS")
-                .ipAddress(clientIp)
-                .build();
-        } else {
-            log = VerificationLog.builder()
-                .certificate(null)
-                .verifiedAt(LocalDateTime.now())
-                .status("FAILED")
-                .ipAddress(clientIp)
-                .build();
+        try {
+            certificate = certificateRepository.findByVerificationCode(verificationCode)
+                    .orElse(null);
+            if (certificate != null) {
+                status = "SUCCESS";
+            }
+        } catch (Exception e) {
+            status = "FAILED";
         }
-        
+
+        VerificationLog log = VerificationLog.builder()
+                .certificate(certificate)
+                .verifiedAt(LocalDateTime.now())
+                .status(status)
+                .ipAddress(clientIp)
+                .build();
+
         return logRepository.save(log);
     }
-    
+
     @Override
     public List<VerificationLog> getLogsByCertificate(Long certificateId) {
         Certificate certificate = certificateRepository.findById(certificateId)
-            .orElseThrow(() -> new ResourceNotFoundException("Certificate not found"));
-        
-        // Return all logs for this certificate
-        return logRepository.findAll().stream()
-            .filter(log -> log.getCertificate() != null && log.getCertificate().getId().equals(certificateId))
-            .toList();
+                .orElseThrow(() -> new ResourceNotFoundException("Certificate not found"));
+        return certificate.getVerificationLogs();
     }
 }
