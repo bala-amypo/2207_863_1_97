@@ -1,43 +1,36 @@
 package com.example.demo.controller;
 
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
 import com.example.demo.entity.CertificateTemplate;
 import com.example.demo.service.TemplateService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/templates")
-@Tag(name = "Template Management", description = "APIs for managing certificate templates")
 public class TemplateController {
-    
-    private final TemplateService templateService;
-    
-    public TemplateController(TemplateService templateService) {
-        this.templateService = templateService;
+
+    private final TemplateService service;
+
+    public TemplateController(TemplateService service) {
+        this.service = service;
     }
-    
+
+    // Add a new template
     @PostMapping
-    @Operation(summary = "Add a new certificate template")
-    public ResponseEntity<CertificateTemplate> addTemplate(@RequestBody CertificateTemplate template) {
-        CertificateTemplate savedTemplate = templateService.addTemplate(template);
-        return ResponseEntity.ok(savedTemplate);
+    public CertificateTemplate addTemplate(@RequestBody CertificateTemplate template) {
+        return service.addTemplate(template);
     }
-    
+
+    // Get all templates
     @GetMapping
-    @Operation(summary = "Get all certificate templates")
-    public ResponseEntity<List<CertificateTemplate>> getAllTemplates() {
-        List<CertificateTemplate> templates = templateService.getAllTemplates();
-        return ResponseEntity.ok(templates);
+    public List<CertificateTemplate> getAllTemplates() {
+        return service.getAllTemplates();
     }
-    
+
+    // Get template by id
     @GetMapping("/{id}")
-    @Operation(summary = "Get template by ID")
-    public ResponseEntity<CertificateTemplate> getTemplate(@PathVariable Long id) {
-        CertificateTemplate template = templateService.findById(id);
-        return ResponseEntity.ok(template);
+    public CertificateTemplate getTemplateById(@PathVariable Long id) {
+        return service.findById(id);
     }
 }
