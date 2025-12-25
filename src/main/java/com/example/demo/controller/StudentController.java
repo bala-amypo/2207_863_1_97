@@ -1,14 +1,14 @@
 package com.example.demo.controller;
 
-import org.springframework.web.bind.annotation.*;
 import com.example.demo.entity.Student;
 import com.example.demo.service.StudentService;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
 @RequestMapping("/students")
 public class StudentController {
-
     private final StudentService studentService;
 
     public StudentController(StudentService studentService) {
@@ -16,12 +16,12 @@ public class StudentController {
     }
 
     @PostMapping
-    public Student addStudent(@RequestBody Student student) {
+    public Student add(@RequestBody Student student) {
         return studentService.addStudent(student);
     }
 
     @GetMapping
-    public List<Student> getAllStudents() {
+    public List<Student> list() {
         return studentService.getAllStudents();
     }
 }
