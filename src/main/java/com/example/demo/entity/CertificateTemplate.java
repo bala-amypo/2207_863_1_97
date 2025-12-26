@@ -5,7 +5,8 @@ import lombok.*;
 
 @Entity
 @Table(name = "certificate_templates")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

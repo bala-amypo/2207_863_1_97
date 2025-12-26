@@ -6,9 +6,10 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "certificates")
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Builder
 public class Certificate {
     @Id
