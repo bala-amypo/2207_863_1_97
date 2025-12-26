@@ -2,14 +2,19 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.VerificationLog;
 import com.example.demo.service.VerificationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
 @RequestMapping("/verify")
+@Tag(name = "Verification", description = "Endpoints for certificate verification and audit logs")
 public class VerificationController {
+
     private final VerificationService verificationService;
 
     public VerificationController(VerificationService verificationService) {
@@ -17,13 +22,16 @@ public class VerificationController {
     }
 
     @PostMapping("/{verificationCode}")
-    public VerificationLog verify(@PathVariable String verificationCode, HttpServletRequest request) {
+    @Operation(summary = "Verify a certificate and log the attempt")
+    public ResponseEntity<VerificationLog> verify(@PathVariable String verificationCode, HttpServletRequest request) {
+        
         String clientIp = request.getRemoteAddr();
-        return verificationService.verifyCertificate(verificationCode, clientIp);
+        return ResponseEntity.ok(verificationService.verifyCertificate(verificationCode, clientIp));
     }
 
     @GetMapping("/logs/{certificateId}")
-    public List<VerificationLog> getLogs(@PathVariable Long certificateId) {
-        return verificationService.getLogsByCertificate(certificateId);
+    @Operation(summary = "Get all verification attempts for a specific certificate")
+    public ResponseEntity<List<VerificationLog>> getLogs(@PathVariable Long certificateId) {
+        return ResponseEntity.ok(verificationService.getLogsByCertificate(certificateId));
     }
 }
