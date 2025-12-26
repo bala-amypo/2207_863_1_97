@@ -1,18 +1,18 @@
 package com.example.demo.security;
 
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.ArrayList;
 
+@Component
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
 
@@ -27,15 +27,12 @@ public class JwtFilter extends OncePerRequestFilter {
         
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-            
             if (jwtUtil.validateToken(token)) {
-                Claims claims = jwtUtil.parseToken(token).getBody();
+                var claims = jwtUtil.parseToken(token).getBody();
                 String email = claims.getSubject();
-                String role = claims.get("role", String.class);
                 
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                    email, null, List.of(new SimpleGrantedAuthority("ROLE_" + role))
-                );
+                UsernamePasswordAuthenticationToken auth = 
+                    new UsernamePasswordAuthenticationToken(email, null, new ArrayList<>());
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }
