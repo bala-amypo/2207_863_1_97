@@ -8,8 +8,8 @@ import org.springframework.context.annotation.Configuration;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import java.util.List;
 
 @Configuration
 public class SwaggerConfig {
@@ -18,8 +18,8 @@ public class SwaggerConfig {
     public OpenAPI openAPI() {
         return new OpenAPI()
                 .servers(List.of(
-                        new Server().url("https://9194.32procr.amypo.ai")
-                ));
+                        new Server().url("https://9194.32procr.amypo.ai/")
+                ))
                 .info(new Info()
                         .title("Digital Certificate Generator API")
                         .description("API for managing digital certificates")
