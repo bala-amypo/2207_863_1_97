@@ -27,11 +27,12 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody RegisterRequest request) {
-        User user = new User();
-        user.setName(request.getName());
-        user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
-        user.setRole(request.getRole());
+        User user = User.builder()
+                .name(request.getName())
+                .email(request.getEmail())
+                .password(request.getPassword())
+                .role(request.getRole())
+                .build();
         
         User savedUser = userService.register(user);
         return ResponseEntity.ok(savedUser);
@@ -50,7 +51,7 @@ public class AuthController {
                 "email", user.getEmail(),
                 "role", user.getRole()
         );
-        
+
         String token = jwtUtil.generateToken(claims, user.getEmail());
         AuthResponse response = new AuthResponse(token, user.getId(), user.getEmail(), user.getRole());
         

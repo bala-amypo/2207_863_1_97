@@ -3,8 +3,8 @@ package com.example.demo.controller;
 import com.example.demo.entity.VerificationLog;
 import com.example.demo.service.VerificationService;
 import org.springframework.web.bind.annotation.*;
-import jakarta.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
